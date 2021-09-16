@@ -1,0 +1,33 @@
+{
+  "playbooks": [
+    [
+      {
+        "collections": [
+          "sensu.sensu_go",
+          "ansible.builtin"
+        ],
+        "tasks": [
+          {
+            "usr": ["name"]
+          },
+          {
+            "openstack.cloud.os_flavor_info": null
+          },
+          {
+            "user": ["username", "password"]
+          },
+          {
+            "composer": ["working-dir"]
+          },
+          {
+            "ansible.builtin.shell": null
+          },
+          {
+            "ansible.builtin.command": null,
+            "changed_when": null
+          }
+        ]
+      }
+    ]
+  ]
+}
