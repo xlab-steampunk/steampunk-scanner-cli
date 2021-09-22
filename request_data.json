@@ -1,33 +1,53 @@
-{
-  "playbooks": [
-    [
-      {
-        "collections": [
-          "sensu.sensu_go",
-          "ansible.builtin"
-        ],
-        "tasks": [
-          {
-            "usr": ["name"]
-          },
-          {
-            "openstack.cloud.os_flavor_info": null
-          },
-          {
-            "user": ["username", "password"]
-          },
-          {
-            "composer": ["working-dir"]
-          },
-          {
-            "ansible.builtin.shell": null
-          },
-          {
-            "ansible.builtin.command": null,
-            "changed_when": null
-          }
-        ]
-      }
-    ]
-  ]
-}
+[
+  {
+    "usr": ["name"],
+    "collections": [
+      "sensu.sensu_go",
+      "ansible.builtin"
+    ],
+    "__file__": "/full/ath/to/source/file.yaml",
+    "__line__": 10
+  },
+  {
+    "openstack.cloud.os_flavor_info": null,
+    "collections": [
+      "sensu.sensu_go",
+      "ansible.builtin"
+    ],
+    "__file__": "/full/ath/to/source/file.yaml",
+    "__line__": 14
+  },
+  {
+    "user": ["username", "password"],
+    "collections": [
+      "sensu.sensu_go",
+      "ansible.builtin"
+    ],
+    "__file__": "/full/ath/to/source/file.yaml",
+    "__line__": 17
+  },
+  {
+    "composer": ["working-dir"],
+    "__file__": "/full/ath/to/source/file.yaml",
+    "__line__": 22
+  },
+  {
+    "ansible.builtin.shell": null,
+    "collections": [
+      "sensu.sensu_go",
+      "ansible.builtin"
+    ],
+    "__file__": "/full/ath/to/source/file.yaml",
+    "__line__": 26
+  },
+  {
+    "ansible.builtin.command": null,
+    "changed_when": null,
+    "collections": [
+      "sensu.sensu_go",
+      "ansible.builtin"
+    ],
+    "__file__": "/full/ath/to/source/file.yaml",
+    "__line__": 29
+  }
+]
