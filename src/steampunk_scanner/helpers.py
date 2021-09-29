@@ -1,3 +1,4 @@
+import sys
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Union
@@ -79,11 +80,7 @@ def _parse_task_file(file: Path) -> List:
     :return: List of parsed Ansible tasks that are prepared for scanning
     """
     with file.open() as stream:
-        try:
-            return _parse_tasks(yaml.load(stream, Loader=SafeLineLoader), str(file.relative_to(Path.cwd())))
-        except Exception as e:
-            print(e)
-            exit(1)
+        return _parse_tasks(yaml.load(stream, Loader=SafeLineLoader), str(file))
 
 
 def _parse_playbook_file(file: Path) -> List:
@@ -93,11 +90,7 @@ def _parse_playbook_file(file: Path) -> List:
     :return: List of parsed Ansible tasks that are prepared for scanning
     """
     with file.open() as stream:
-        try:
-            return _parse_playbook(yaml.load(stream, Loader=SafeLineLoader)[0], str(file.relative_to(Path.cwd())))
-        except Exception as e:
-            print(e)
-            exit(1)
+        return _parse_playbook(yaml.load(stream, Loader=SafeLineLoader)[0], str(file.relative_to(Path.cwd())))
 
 
 def _parse_role_dir(directory: Path) -> List:
@@ -109,14 +102,10 @@ def _parse_role_dir(directory: Path) -> List:
     parsed_role = []
     for file in (list((directory / "tasks").rglob("*")) + list((directory / "handlers").rglob("*"))):
         if file.is_file():
-            try:
-                with file.open() as stream:
-                    yaml_dict = yaml.load(stream, Loader=SafeLineLoader)
-                    parsed_tasks = _parse_tasks(yaml_dict, str(file.relative_to(Path.cwd())))
-                    parsed_role += parsed_tasks
-            except Exception as e:
-                print(e)
-                exit(1)
+            with file.open() as stream:
+                yaml_dict = yaml.load(stream, Loader=SafeLineLoader)
+                parsed_tasks = _parse_tasks(yaml_dict, str(file))
+                parsed_role += parsed_tasks
     return parsed_role
 
 
@@ -130,7 +119,7 @@ def parse_role_dirs(dirs: List[Path]) -> List:
     for directory in dirs:
         if not directory.is_dir():
             print(f"File {directory.name} is not a valid directory")
-            exit(1)
+            sys.exit(1)
         parsed_files += _parse_role_dir(directory)
 
     return parsed_files
@@ -165,55 +154,22 @@ def parse_ansible_entities(paths: Union[Path, List[Path]], ansible_entity_type: 
             if ansible_entity_type == AnsibleEntity.TASK:
                 if not path.is_file():
                     print(f"Task file {path.name} is not a valid file")
-                    exit(1)
+                    sys.exit(1)
                 parsed_ansible_entities += _parse_task_file(path)
             if ansible_entity_type == AnsibleEntity.PLAYBOOK:
                 if not path.is_file():
                     print(f"Playbook {path.name} is not a valid file")
-                    exit(1)
+                    sys.exit(1)
                 parsed_ansible_entities += _parse_playbook_file(path)
             if ansible_entity_type == AnsibleEntity.ROLE:
                 if not path.is_dir():
                     print(f"Role {path.name} is not a valid directory")
-                    exit(1)
+                    sys.exit(1)
                 parsed_ansible_entities += _parse_role_dir(path)
             if ansible_entity_type == AnsibleEntity.COLLECTION:
                 if not path.is_dir():
                     print(f"Collection {path.name} is not a valid directory")
-                    exit(1)
+                    sys.exit(1)
                 parsed_ansible_entities += _parse_collection_dir(path)
 
     return parsed_ansible_entities
-
-
-def prepare_scan_output(input_tasks: List, output_tasks: List) -> str:
-    """
-    Prepares scan output
-    :param input_tasks: Input Ansible task list
-    :param output_tasks: Output Ansible task list
-    :return: Scan output
-    """
-    scan_output = ""
-    for i in range(len(output_tasks)):
-        output_task = output_tasks[i]
-        input_task = input_tasks[i]
-
-        file_name = input_task.get("__file__", None)
-        task_line = input_task.get("__line__", None)
-        certified = output_task.get("certified", True)
-        errors = output_task.get("errors", None)
-        fqcn = output_task.get("fqcn", None)
-        hints = output_task.get("hints", None)
-
-        if fqcn and not certified:
-            scan_output += f"{file_name}:{task_line}: WARNING: The {fqcn} module is not certified.\n"
-
-        if errors:
-            for error in errors:
-                scan_output += f"{file_name}:{task_line}: ERROR: {error}\n"
-
-        if hints:
-            for hint in hints:
-                scan_output += f"{file_name}:{task_line}: HINT: {hint}\n"
-
-    return scan_output.strip()

@@ -4,9 +4,6 @@ import sys
 
 from steampunk_scanner import commands
 
-# change this development API endpoint to a real one when production API auth works and when this CLI is ready
-API_ENDPOINT = "http://10.44.17.54/api"
-
 
 class ArgParser(argparse.ArgumentParser):
     """An argument parser that displays help on error"""

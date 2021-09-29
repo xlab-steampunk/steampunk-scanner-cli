@@ -1,10 +1,7 @@
 import argparse
-import json
 from getpass import getpass
 
-import requests
-
-from steampunk_scanner.cli import API_ENDPOINT
+from steampunk_scanner import api
 
 
 def add_parser(subparsers):
@@ -38,18 +35,15 @@ def _parser_callback_new(args: argparse.Namespace):
     Registers a new account
     :param args: Argparse arguments
     """
-    try:
-        password = getpass()
-        response = requests.post(f"{API_ENDPOINT}/accounts/register",
-                                 data={"username": args.username, "password": password})
-        if response.ok:
-            json_output = json.loads(response.text)
-            print(json_output.get("msg", None))
-        else:
-            print(f"API error: {response.status_code} - {response.reason}")
-            exit(1)
-    except Exception as e:
-        print(e)
+    password = getpass()
+    client = api.Client(api.ENDPOINT)
+    response = client.post(
+        "/accounts/register", dict(username=args.username, password=password)
+    )
+    if response.ok:
+        print(response.json()["msg"])
+    else:
+        print(f"API error: {response.status_code} - {response.json()['msg']}")
         exit(1)
 
 
@@ -58,16 +52,13 @@ def _parser_callback_activate(args: argparse.Namespace):
     Activates pending account
     :param args: Argparse arguments
     """
-    try:
-        password = getpass()
-        response = requests.post(f"{API_ENDPOINT}/accounts/activate",
-                                 data={"username": args.username, "verification_code": password})
-        if response.ok:
-            json_output = json.loads(response.text)
-            print(json_output.get("msg", None))
-        else:
-            print(f"API error: {response.status_code} - {response.reason}")
-            exit(1)
-    except Exception as e:
-        print(e)
+    client = api.Client(api.ENDPOINT)
+    response = client.post(
+        "/accounts/activate",
+        dict(username=args.username, verification_code=args.verification_code)
+    )
+    if response.ok:
+        print(response.json()["msg"])
+    else:
+        print(f"API error: {response.status_code} - {response.json()['msg']}")
         exit(1)
