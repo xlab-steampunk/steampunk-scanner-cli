@@ -6,8 +6,12 @@ from pathlib import Path
 
 import requests
 
-from src.cli import API_ENDPOINT
-from src.helpers import prepare_scan_output, AnsibleEntity, parse_ansible_entities
+from steampunk_scanner.cli import API_ENDPOINT
+from steampunk_scanner.helpers import (
+    prepare_scan_output,
+    AnsibleEntity,
+    parse_ansible_entities,
+)
 
 
 def add_parser(subparsers):

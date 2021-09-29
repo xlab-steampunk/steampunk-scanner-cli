@@ -4,7 +4,7 @@ from getpass import getpass
 
 import requests
 
-from src.cli import API_ENDPOINT
+from steampunk_scanner.cli import API_ENDPOINT
 
 
 def add_parser(subparsers):

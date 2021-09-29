@@ -2,7 +2,7 @@ import argparse
 import inspect
 import sys
 
-from src import commands
+from steampunk_scanner import commands
 
 # change this development API endpoint to a real one when production API auth works and when this CLI is ready
 API_ENDPOINT = "http://10.44.17.54/api"
