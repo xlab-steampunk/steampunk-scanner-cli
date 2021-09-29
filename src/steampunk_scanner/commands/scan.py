@@ -56,6 +56,7 @@ def _parser_callback(args: argparse.Namespace):
         print(f"API error: {response.status_code} - {response.json()['msg']}")
         sys.exit(1)
 
+
 def _print_scan_output(out_fh, input_tasks, output_tasks):
     """
     Prints scan output

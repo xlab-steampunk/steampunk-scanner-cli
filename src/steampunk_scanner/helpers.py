@@ -41,6 +41,14 @@ def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None
         task.pop("name", None)
         task_line = task.pop("__line__", None)
 
+        # TODO: Remove this spaghetti when API will be able to parse action plugins
+        if "action" in task:
+            dict_with_module = next((d for d in list(task.values()) if type(d) is dict and "module" in d), None)
+            if dict_with_module is not None:
+                module_name = dict_with_module.pop("module", None)
+                action = task.pop("action", None)
+                task[module_name] = action
+
         for task_key in task:
             if type(task[task_key]) is dict:
                 task[task_key].pop("__line__", None)

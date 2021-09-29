@@ -1,7 +1,6 @@
 import requests
 
-# TODO: change this development API endpoint to a real one when production API auth
-# works and when this CLI is ready.
+# TODO: Change this development API endpoint to a real one when production API auth works and when this CLI is ready
 ENDPOINT = "http://10.44.17.54/api"
 
 
