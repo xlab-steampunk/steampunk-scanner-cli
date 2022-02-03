@@ -13,4 +13,4 @@ class Client:
         args = dict(json=payload)
         if self.username:
             args["auth"] = (self.username, self.password)
-        return requests.post(f"{self.url}{path}", **args)
+        return requests.post(f"{self.url}{path}", timeout=10, **args)
