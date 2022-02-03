@@ -1,6 +1,7 @@
 import requests
+import os
 
-ENDPOINT = "https://scanner.steampunk.si/api"
+ENDPOINT = os.environ.get("SCANNER_ENDPOINT", "https://scanner.steampunk.si/api")
 
 
 class Client:
