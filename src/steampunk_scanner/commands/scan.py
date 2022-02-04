@@ -84,5 +84,5 @@ def _print_scan_output(out_fh, input_tasks, output_tasks):
         for hint in hints:
             print(f"{file_name}:{task_line}: HINT: {hint}", file=out_fh)
 
-        if errors:
-            sys.exit(1)
+    if errors:
+        sys.exit(1)
