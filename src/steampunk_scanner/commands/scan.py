@@ -68,6 +68,7 @@ def _print_scan_output(out_fh, input_tasks, output_tasks):
     for input_task, output_task in zip(input_tasks, output_tasks):
         file_name = input_task.get("__file__", None)
         task_line = input_task.get("__line__", None)
+        task_column = input_task.get("__column__", None)
         certified = output_task.get("certified", False)
         errors = output_task.get("errors", [])
         fqcn = output_task.get("fqcn", None)
@@ -75,16 +76,16 @@ def _print_scan_output(out_fh, input_tasks, output_tasks):
 
         if fqcn and not certified:
             print(
-                f"{file_name}:{task_line}: WARNING: The {fqcn} module is not certified.",
+                f"{file_name}:{task_line}:{task_column} WARNING: The {fqcn} module is not certified.",
                 file=out_fh
             )
 
         for error in errors:
-            print(f"{file_name}:{task_line}: ERROR: {error}", file=out_fh)
+            print(f"{file_name}:{task_line}:{task_column} ERROR: {error}", file=out_fh)
             failed = True
 
         for hint in hints:
-            print(f"{file_name}:{task_line}: HINT: {hint}", file=out_fh)
+            print(f"{file_name}:{task_line}:{task_column} HINT: {hint}", file=out_fh)
 
     if failed:
         sys.exit(1)

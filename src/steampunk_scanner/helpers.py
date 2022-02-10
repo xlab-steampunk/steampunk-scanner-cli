@@ -18,6 +18,7 @@ class SafeLineLoader(yaml.loader.SafeLoader):
         """
         mapping = super(SafeLineLoader, self).construct_mapping(node, deep=deep)
         mapping['__line__'] = node.start_mark.line + 1
+        mapping['__column__'] = node.start_mark.column + 1
         return mapping
 
 
@@ -40,6 +41,7 @@ def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None
     for task in tasks:
         task.pop("name", None)
         task_line = task.pop("__line__", None)
+        task_column = task.pop("__column__", None)
 
         # TODO: Remove this spaghetti when API will be able to parse action plugins
         if "action" in task:
@@ -52,6 +54,7 @@ def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None
         for task_key in task:
             if type(task[task_key]) is dict:
                 task[task_key].pop("__line__", None)
+                task[task_key].pop("__column__", None)
                 task[task_key] = list(task[task_key].keys())
             else:
                 task[task_key] = None
@@ -62,6 +65,7 @@ def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None
         task["collections"] = collections
         task["__file__"] = file_name
         task["__line__"] = task_line
+        task["__column__"] = task_column
 
     return tasks
 
@@ -76,6 +80,7 @@ def _parse_playbook(playbook: dict, file_name: str) -> List:
     playbook.pop("name", None)
     playbook.pop("hosts", None)
     playbook.pop("__line__", None)
+    playbook.pop("__column__", None)
     collections = playbook.pop("collections", None)
 
     return _parse_tasks(playbook.get("tasks", []), file_name, collections)
