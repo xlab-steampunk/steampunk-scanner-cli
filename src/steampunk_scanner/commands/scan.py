@@ -58,6 +58,7 @@ def _parser_callback(args: argparse.Namespace):
 
 
 def _print_scan_output(out_fh, input_tasks, output_tasks):
+    failed = False
     """
     Prints scan output
     :param out_fh: File handle to print result to
@@ -80,9 +81,10 @@ def _print_scan_output(out_fh, input_tasks, output_tasks):
 
         for error in errors:
             print(f"{file_name}:{task_line}: ERROR: {error}", file=out_fh)
+            failed = True
 
         for hint in hints:
             print(f"{file_name}:{task_line}: HINT: {hint}", file=out_fh)
 
-    if errors:
+    if failed:
         sys.exit(1)
