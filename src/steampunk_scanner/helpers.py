@@ -48,6 +48,9 @@ def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None
                 module_name = dict_with_module.pop("module", None)
                 action = task.pop("action", None)
                 task[module_name] = action
+        if "block" in task:
+            yield from _parse_tasks(task["block"], file_name, collections)
+            continue
 
         for task_key in task:
             if type(task[task_key]) is dict:
@@ -63,7 +66,7 @@ def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None
         task["__file__"] = file_name
         task["__line__"] = task_line
 
-    return tasks
+        yield task
 
 
 def _parse_playbook(playbook: dict, file_name: str) -> List:
