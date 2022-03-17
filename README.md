@@ -3,6 +3,10 @@
 This project brings a Command Line Interface (CLI) for the [Steampunk Scanner]
 (developed by [XLAB Steampunk]).
 
+[![PyPI](https://img.shields.io/pypi/v/steampunk-scanner)](https://pypi.org/project/steampunk-scanner/)
+[![Test PyPI](https://img.shields.io/badge/test%20pypi-dev%20version-blueviolet)](https://test.pypi.org/project/steampunk-scanner/)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/xlab-steampunk/steampunk-scanner-cli/Build%20and%20publish?label=CI/CD)](https://github.com/xlab-steampunk/steampunk-scanner-cli/actions)
+
 
 ## Table of Contents
 
@@ -57,6 +61,14 @@ from the latest [PyPI production] version, you can also find the latest [PyPI
 development] version, which includes pre-releases so that you will be able to
 test the latest features before they are officially released.
 
+If you want to run from directly from source fo the following
+
+```
+$ git clone git@github.com:xlab-steampunk/steampunk-scanner-cli.git
+$ python3 -m venv .venv && . .venv/bin/activate
+(.venv) $ pip install -e .
+```
+
 
 ## Usage
 
@@ -71,7 +83,7 @@ Scanner user account.
 
 To register a new user with your email, use the `register` command like this:
 
-```bash
+```console
 (.venv) $ steampunk-scanner account register email@example.com
 Password:
 ```
@@ -79,7 +91,7 @@ Password:
 After that step, your account is still pending for activation.  We will send
 you an email with an activation code, which you can use like that:
 
-```bash
+```console
 (.venv) $ steampunk-scanner account activate email@example.com <activation code>
 ```
 
@@ -96,7 +108,7 @@ The CLI `scan` command is used for Ansible scanning and returning back the scan
 results. It accepts for different switches for different Ansible entities
 (tasks, playbooks, roles and collections).
 
-```bash
+```console
 # scan Ansible task file, which is just unindented `tasks` section of the playbook
 (.venv) $ steampunk-scanner scan \
     --tasks path/to/taskfile1.yaml
@@ -123,6 +135,9 @@ results. It accepts for different switches for different Ansible entities
     --playbooks path/to/playbook.yaml \
     --roles path/to/role \
     --collections path/to/collection
+
+# scan folder with Ansible playbooks (without CLI flags)
+(.venv) $ steampunk-scanner scan path/to/folder
 ```
 
 
@@ -130,7 +145,7 @@ results. It accepts for different switches for different Ansible entities
 
 Let us assume we have the following `taskfile.yaml` file:
 
-```
+```yaml
  1 ---
  2 - name: Configure agent (Linux)
  3   include_tasks: linux/configure.yml
@@ -143,7 +158,7 @@ Let us assume we have the following `taskfile.yaml` file:
 
 In this case, the CLI tool will report something like that back:
 
-```
+```console
 (.venv) $ steampunk-scanner scan --tasks taskfile.yaml
 taskfile.yaml:2: HINT: The 'include_tasks' module is redirected to the
   'ansible.builtin.include_tasks' module. You should use fully-qualified
@@ -158,7 +173,7 @@ taskfile.yaml:6: HINT: The 'include_tasks' module is redirected to the
 
 Let us assume we have the following Ansible playbook `playbook.yaml` file:
 
-```
+```yaml
  1 ---
  2 - name: Sample playbook
  3   hosts: localhost
@@ -178,7 +193,7 @@ Let us assume we have the following Ansible playbook `playbook.yaml` file:
 
 In this case, the CLI tool will report something like that back:
 
-```
+```console
 (.venv) $ steampunk-scanner scan --playbooks playbook.yaml
 playbook.yaml:10: ERROR: Cannot find module information in the database. Is
   this a custom module not published on Ansible Galaxy?
@@ -219,7 +234,7 @@ sensu-go/roles/backend/
 
 In this case, the CLI tool will scan `tasks` and `handlers` and report something like that back:
 
-```
+```console
 (.venv) $ steampunk-scanner scan --roles sensu-go/roles/backend/
 sensu-go/roles/backend/tasks/start.yml:2: HINT: The 'service' module is
   redirected to the 'ansible.builtin.service' module. You should use
@@ -269,7 +284,7 @@ sensu-go/roles/backend/handlers/main.yml:2: HINT: The 'service' module is
 Let us assume we have an Ansible collection (for instance [Sensu Go Ansible
 Collection]) with the following structure:
 
-```
+```console
 (.venv) $ ls -l sensu-go/
 total 116
 drwxrwxr-x 2 user user  4096 Sep  6 09:28 changelogs
@@ -296,7 +311,7 @@ drwxrwxr-x 3 user user  4096 Sep  6 09:28 vagrant
 In this case, the CLI tool will scan `roles` and `playbooks` and report
 something like that back:
 
-```
+```console
 (.venv) $ steampunk-scanner scan --collections sensu-go
 sensu-go/roles/backend/tasks/start.yml:2: HINT: The 'service' module is
   redirected to the 'ansible.builtin.service' module. You should use
