@@ -120,22 +120,6 @@ def _parse_role_dir(directory: Path) -> List:
     return parsed_role
 
 
-def parse_role_dirs(dirs: List[Path]) -> List:
-    """
-    Parse multiple Ansible roles
-    :param dirs: List of roles as directories
-    :return: List of parsed Ansible tasks that are prepared for scanning
-    """
-    parsed_files = []
-    for directory in dirs:
-        if not directory.is_dir():
-            print(f"File {directory.name} is not a valid directory")
-            sys.exit(1)
-        parsed_files += _parse_role_dir(directory)
-
-    return parsed_files
-
-
 def _parse_collection_dir(directory: Path) -> List:
     """
     Parse Ansible collection
