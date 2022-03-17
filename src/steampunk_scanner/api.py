@@ -1,5 +1,6 @@
-import requests
 import os
+
+import requests
 
 ENDPOINT = os.environ.get("SCANNER_ENDPOINT", "https://scanner.steampunk.si/api")
 
