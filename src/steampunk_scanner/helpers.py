@@ -1,7 +1,7 @@
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional
 
 import yaml
 
@@ -136,35 +136,102 @@ def _parse_collection_dir(directory: Path) -> List:
     return parsed_collection
 
 
-def parse_ansible_entities(paths: Union[Path, List[Path]], ansible_entity_type: AnsibleEntity) -> List:
+def is_playbook(file: Path) -> bool:
+    """
+    Check if file is a playbook
+    :param file: Path to file
+    :return: True or False
+    """
+    # Used from https://github.com/ansible-community/ansible-lint/blob/main/src/ansiblelint/utils.py
+    playbook_keys = {
+        "gather_facts",
+        "hosts",
+        "import_playbook",
+        "post_tasks",
+        "pre_tasks",
+        "roles",
+        "tasks",
+    }
+
+    with file.open() as f:
+        try:
+            loaded_yaml = yaml.safe_load(f)
+            if isinstance(loaded_yaml, list):
+                if playbook_keys.intersection(loaded_yaml[0].keys()):
+                    return True
+            if isinstance(loaded_yaml, dict):
+                if playbook_keys.intersection(loaded_yaml.keys()):
+                    return True
+        except yaml.YAMLError:
+            return False
+
+    return False
+
+
+def parse_known_ansible_entity(path: Path, ansible_entity_type: AnsibleEntity) -> List:
+    """
+    Parse Ansible entity (known by type)
+    :param path: Path to Ansible entity
+    :param ansible_entity_type: Type of Ansible files (task files, playbooks, roles or collections)
+    :return: Parsed Ansible tasks that are prepared for scanning
+    """
+    if ansible_entity_type == AnsibleEntity.TASK:
+        if not path.is_file():
+            print(f"Task file {path.name} is not a valid file")
+            sys.exit(1)
+        return _parse_task_file(path)
+    if ansible_entity_type == AnsibleEntity.PLAYBOOK:
+        if not path.is_file():
+            print(f"Playbook {path.name} is not a valid file")
+            sys.exit(1)
+        return _parse_playbook_file(path)
+    if ansible_entity_type == AnsibleEntity.ROLE:
+        if not path.is_dir():
+            print(f"Role {path.name} is not a valid directory")
+            sys.exit(1)
+        return _parse_role_dir(path)
+    if ansible_entity_type == AnsibleEntity.COLLECTION:
+        if not path.is_dir():
+            print(f"Collection {path.name} is not a valid directory")
+            sys.exit(1)
+        return _parse_collection_dir(path)
+    else:
+        print(f"Unknown Ansible entity type {ansible_entity_type}")
+        sys.exit(1)
+
+
+def parse_unknown_ansible_entity(path: Path) -> List:
+    """
+    Parse Ansible entity (unknown by type, right now works only for playbooks by detecting them - parse if path is a
+    playbook or recursively iterate through files and parse playbooks if path is a directory
+    :param path: Path to file or directory
+    :return: List of parsed Ansible tasks that are prepared for scanning
+    """
+    parsed_ansible_entities = []
+    yaml_suffixes = ('.yml', '.yaml')
+    if path.is_file() and path.suffix in yaml_suffixes and is_playbook(path):
+        parsed_ansible_entities += parse_known_ansible_entity(path, AnsibleEntity.PLAYBOOK)
+    if path.is_dir():
+        yaml_paths = [yml for gen in [path.rglob(f"*{suf}") for suf in yaml_suffixes] for yml in gen]
+        for yaml_path in yaml_paths:
+            parsed_ansible_entities += parse_unknown_ansible_entity(yaml_path)
+
+    return parsed_ansible_entities
+
+
+def parse_ansible_entities(paths: List[Path], ansible_entity_type: Optional[AnsibleEntity] = None) -> List:
     """
     Parse multiple Ansible entities
-    :param paths: Path or list of paths to Ansible entities
-    :param ansible_entity_type: Type of Ansible files (task files, playbooks, roles or collections)
+    :param paths: List of paths to Ansible entities
+    :param ansible_entity_type: Type of Ansible files (task files, playbooks, roles or collections) or None
     :return: List of parsed Ansible tasks that are prepared for scanning
     """
     parsed_ansible_entities = []
     if isinstance(paths, list):
         for path in paths:
-            if ansible_entity_type == AnsibleEntity.TASK:
-                if not path.is_file():
-                    print(f"Task file {path.name} is not a valid file")
-                    sys.exit(1)
-                parsed_ansible_entities += _parse_task_file(path)
-            if ansible_entity_type == AnsibleEntity.PLAYBOOK:
-                if not path.is_file():
-                    print(f"Playbook {path.name} is not a valid file")
-                    sys.exit(1)
-                parsed_ansible_entities += _parse_playbook_file(path)
-            if ansible_entity_type == AnsibleEntity.ROLE:
-                if not path.is_dir():
-                    print(f"Role {path.name} is not a valid directory")
-                    sys.exit(1)
-                parsed_ansible_entities += _parse_role_dir(path)
-            if ansible_entity_type == AnsibleEntity.COLLECTION:
-                if not path.is_dir():
-                    print(f"Collection {path.name} is not a valid directory")
-                    sys.exit(1)
-                parsed_ansible_entities += _parse_collection_dir(path)
+            if ansible_entity_type:
+                parsed_ansible_entities += parse_known_ansible_entity(path, ansible_entity_type)
+            else:
+                parsed_ansible_entities += parse_unknown_ansible_entity(path)
 
     return parsed_ansible_entities

@@ -27,6 +27,9 @@ def add_parser(subparsers):
     parser.add_argument(
         "--output", "-o", type=argparse.FileType("w"), help="Output file location", default="-"
     )
+    parser.add_argument(
+        "entities", type=lambda p: Path(p).absolute(), nargs='*', help="Path to Ansible entity or directory",
+    )
     parser.set_defaults(func=_parser_callback)
 
 
@@ -48,6 +51,8 @@ def _parser_callback(args: argparse.Namespace):
         input_tasks += parse_ansible_entities(args.roles, AnsibleEntity.ROLE)
     if args.collections:
         input_tasks += parse_ansible_entities(args.collections, AnsibleEntity.COLLECTION)
+    if args.entities:
+        input_tasks += parse_ansible_entities(args.entities)
 
     response = client.post("/scan-tasks", input_tasks)
     if response.ok:
