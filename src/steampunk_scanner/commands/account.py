@@ -4,7 +4,11 @@ from getpass import getpass
 from steampunk_scanner import api
 
 
-def add_parser(subparsers):
+def add_parser(subparsers: argparse._SubParsersAction):
+    """
+    Adds a new parser to subparsers
+    :param subparsers: Subparsers action
+    """
     parser = subparsers.add_parser(
         "account", help="Manage user account", description="Manage user account"
     )
@@ -32,7 +36,7 @@ def add_parser(subparsers):
 
 def _parser_callback_new(args: argparse.Namespace):
     """
-    Registers a new account
+    Registers a new account (parser callback function)
     :param args: Argparse arguments
     """
     password = getpass()
@@ -49,7 +53,7 @@ def _parser_callback_new(args: argparse.Namespace):
 
 def _parser_callback_activate(args: argparse.Namespace):
     """
-    Activates pending account
+    Activates pending account (parser callback function)
     :param args: Argparse arguments
     """
     client = api.Client(api.ENDPOINT)
