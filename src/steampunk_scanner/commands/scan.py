@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import TextIO
 
 from steampunk_scanner import api
+from steampunk_scanner.workspace import Workspace
 from steampunk_scanner.helpers import AnsibleEntity, parse_ansible_entities
 
 
@@ -46,6 +47,7 @@ def _parser_callback(args: argparse.Namespace):
     username = os.environ.get("SCANNER_USERNAME") or input("Username: ")
     password = os.environ.get("SCANNER_PASSWORD") or getpass()
     client = api.Client(api.ENDPOINT, username, password)
+    workspace = Workspace()
 
     input_tasks = []
     if args.tasks:
@@ -61,6 +63,7 @@ def _parser_callback(args: argparse.Namespace):
 
     response = client.post("/scan-tasks", input_tasks)
     if response.ok:
+        workspace.discover()
         _print_scan_output(args.output, input_tasks, response.json())
     else:
         print(f"API error: {response.status_code} - {response.json()['msg']}")
