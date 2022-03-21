@@ -3,12 +3,17 @@ import os
 import sys
 from getpass import getpass
 from pathlib import Path
+from typing import TextIO
 
 from steampunk_scanner import api
 from steampunk_scanner.helpers import AnsibleEntity, parse_ansible_entities
 
 
-def add_parser(subparsers):
+def add_parser(subparsers: argparse._SubParsersAction):
+    """
+    Adds a new parser to subparsers
+    :param subparsers: Subparsers action
+    """
     parser = subparsers.add_parser(
         "scan", help="Initiate Ansible scan", description="Initiate Ansible scan"
     )
@@ -35,7 +40,7 @@ def add_parser(subparsers):
 
 def _parser_callback(args: argparse.Namespace):
     """
-    Invoke the Ansible scanner and print/save the scan result
+    Invoke the Ansible scanner and print/save the scan result (parser callback function)
     :param args: Argparse arguments
     """
     username = os.environ.get("SCANNER_USERNAME") or input("Username: ")
@@ -62,14 +67,14 @@ def _parser_callback(args: argparse.Namespace):
         sys.exit(1)
 
 
-def _print_scan_output(out_fh, input_tasks, output_tasks):
-    failed = False
+def _print_scan_output(out_fh: TextIO, input_tasks: list, output_tasks: list):
     """
     Prints scan output
     :param out_fh: File handle to print result to
     :param input_tasks: Input Ansible task list
     :param output_tasks: Output Ansible task list
     """
+    failed = False
     for input_task, output_task in zip(input_tasks, output_tasks):
         file_name = input_task.get("__file__", None)
         task_line = input_task.get("__line__", None)

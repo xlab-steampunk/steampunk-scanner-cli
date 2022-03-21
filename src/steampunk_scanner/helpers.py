@@ -29,7 +29,7 @@ class AnsibleEntity(Enum):
     COLLECTION = 4
 
 
-def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None) -> List:
+def _parse_tasks(tasks: list, file_name: str, collections: Optional[list] = None) -> list:
     """
     Parse Ansible tasks and prepare them for scanning
     :param tasks: List of Ansible task dicts
@@ -69,7 +69,7 @@ def _parse_tasks(tasks: List, file_name: str, collections: Optional[List] = None
         yield task
 
 
-def _parse_playbook(playbook: dict, file_name: str) -> List:
+def _parse_playbook(playbook: dict, file_name: str) -> list:
     """
     Parse Ansible playbook and prepare it for scanning
     :param playbook: Ansible playbook as dict
@@ -84,7 +84,7 @@ def _parse_playbook(playbook: dict, file_name: str) -> List:
     return _parse_tasks(playbook.get("tasks", []), file_name, collections)
 
 
-def _parse_task_file(file: Path) -> List:
+def _parse_task_file(file: Path) -> list:
     """
     Parse Ansible file
     :param file: Ansible task file
@@ -94,7 +94,7 @@ def _parse_task_file(file: Path) -> List:
         return _parse_tasks(yaml.load(stream, Loader=SafeLineLoader), str(file))
 
 
-def _parse_playbook_file(file: Path) -> List:
+def _parse_playbook_file(file: Path) -> list:
     """
     Parse Ansible playbook file
     :param file: Ansible playbook file
@@ -104,7 +104,7 @@ def _parse_playbook_file(file: Path) -> List:
         return _parse_playbook(yaml.load(stream, Loader=SafeLineLoader)[0], str(file.relative_to(Path.cwd())))
 
 
-def _parse_role_dir(directory: Path) -> List:
+def _parse_role_dir(directory: Path) -> list:
     """
     Parse Ansible role
     :param directory: Role directory
@@ -120,7 +120,7 @@ def _parse_role_dir(directory: Path) -> List:
     return parsed_role
 
 
-def _parse_collection_dir(directory: Path) -> List:
+def _parse_collection_dir(directory: Path) -> list:
     """
     Parse Ansible collection
     :param directory: Collection directory
@@ -168,7 +168,7 @@ def is_playbook(file: Path) -> bool:
     return False
 
 
-def parse_known_ansible_entity(path: Path, ansible_entity_type: AnsibleEntity) -> List:
+def parse_known_ansible_entity(path: Path, ansible_entity_type: AnsibleEntity) -> list:
     """
     Parse Ansible entity (known by type)
     :param path: Path to Ansible entity
@@ -200,7 +200,7 @@ def parse_known_ansible_entity(path: Path, ansible_entity_type: AnsibleEntity) -
         sys.exit(1)
 
 
-def parse_unknown_ansible_entity(path: Path) -> List:
+def parse_unknown_ansible_entity(path: Path) -> list:
     """
     Parse Ansible entity (unknown by type, right now works only for playbooks by detecting them - parse if path is a
     playbook or recursively iterate through files and parse playbooks if path is a directory
@@ -219,7 +219,7 @@ def parse_unknown_ansible_entity(path: Path) -> List:
     return parsed_ansible_entities
 
 
-def parse_ansible_entities(paths: List[Path], ansible_entity_type: Optional[AnsibleEntity] = None) -> List:
+def parse_ansible_entities(paths: List[Path], ansible_entity_type: Optional[AnsibleEntity] = None) -> list:
     """
     Parse multiple Ansible entities
     :param paths: List of paths to Ansible entities

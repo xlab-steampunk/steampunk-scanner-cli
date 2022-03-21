@@ -8,7 +8,7 @@ from steampunk_scanner import commands
 class ArgParser(argparse.ArgumentParser):
     """An argument parser that displays help on error"""
 
-    def error(self, message):
+    def error(self, message: str):
         """
         Overridden the original error method
         :param message: Error message
@@ -17,7 +17,7 @@ class ArgParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
-    def add_subparsers(self, **kwargs):
+    def add_subparsers(self, **kwargs) -> argparse._SubParsersAction:
         """
         Overridden the original add_subparsers method (workaround for http://bugs.python.org/issue9253)
         """
@@ -27,7 +27,7 @@ class ArgParser(argparse.ArgumentParser):
         return subparsers
 
 
-def create_parser():
+def create_parser() -> ArgParser:
     """
     Create argument parser for CLI
     :return: Parser as argparse.ArgumentParser object
@@ -41,7 +41,7 @@ def create_parser():
     return parser
 
 
-def main():
+def main() -> ArgParser:
     """
     Main CLI method to be called
     """
